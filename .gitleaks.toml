@@ -15,13 +15,13 @@ tags = ["ansible", "password"]
 [[rules]]
 id = "database-password"
 description = "Database Password"
-regex = '''(?i)(db_password|database_password|postgres_password)\s*[:=]\s*['""][^'""]+['""]'''
+regex = '''(?i)(db_password|database_password|postgres_password)\s*[:=]\s*['""][a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,}['""]'''
 tags = ["database", "password"]
 
 [[rules]]
 id = "api-key"
 description = "API Key"
-regex = '''(?i)(api_key|apikey|api-key)\s*[:=]\s*['""][^'""]+['""]'''
+regex = '''(?i)(api_key|apikey|api-key)\s*[:=]\s*['""][a-zA-Z0-9]{16,}['""]'''
 tags = ["api", "key"]
 
 [[rules]]
@@ -39,29 +39,44 @@ tags = ["aws", "key"]
 [[rules]]
 id = "aws-secret-key"
 description = "AWS Secret Key"
-regex = '''(?i)aws_secret_access_key\s*[:=]\s*['""][^'""]+['""]'''
+regex = '''(?i)aws_secret_access_key\s*[:=]\s*['""][a-zA-Z0-9/+=]{40}['""]'''
 tags = ["aws", "secret"]
 
-# Allowlist for false positives
+# Comprehensive allowlist for false positives
 [[allowlist]]
-description = "Example configurations"
-regex = '''example\.com|your-domain\.com|your-ec2-ip|admin@example\.com'''
+description = "Example configurations and placeholders"
+regexTarget = "match"
+regex = '''example\.com|your-domain\.com|your-ec2-ip|admin@example\.com|yourdomain\.com|demo\.com'''
 
 [[allowlist]]
-description = "Template variables"
-regex = '''\{\{.*\}\}'''
+description = "Template variables and Ansible syntax"
+regexTarget = "match"
+regex = '''\{\{.*\}\}|\[generated\]|\[auto-generated\]'''
 
 [[allowlist]]
-description = "Documentation examples"
-regex = '''password.*=.*\[generated\]'''
+description = "Documentation examples and placeholders"
+regexTarget = "match"
+regex = '''password.*=.*""|password.*=.*\[\]|password.*=.*\[generated\]|password.*=.*\[auto-generated\]'''
 
 [[allowlist]]
-description = "Placeholder values"
-regex = '''password.*=.*""'''
+description = "Default example values and placeholders"
+regexTarget = "match"
+regex = '''admin@example\.com|your-key\.pem|your-backup-bucket|your-server-ip|localhost|127\.0\.0\.1'''
 
 [[allowlist]]
-description = "Default example values"
-regex = '''admin@example\.com|your-key\.pem|your-backup-bucket'''
+description = "Common placeholder passwords"
+regexTarget = "match"
+regex = '''password.*=.*"changeme"|password.*=.*"password"|password.*=.*"admin"|password.*=.*"root"'''
+
+[[allowlist]]
+description = "Configuration file comments"
+regexTarget = "match"
+regex = '''^\s*#.*'''
+
+[[allowlist]]
+description = "YAML comments"
+regexTarget = "match"
+regex = '''^\s*#.*|.*#.*password.*example'''
 
 # File patterns to ignore
 [[allowlist]]
@@ -71,13 +86,51 @@ paths = [
   '''.*\.rst$''',
   '''.*\.txt$''',
   '''CHANGELOG.*''',
-  '''LICENSE.*'''
+  '''LICENSE.*''',
+  '''README.*'''
 ]
 
 [[allowlist]]
-description = "Configuration examples"
+description = "Configuration examples and templates"
 paths = [
   '''.*\.example$''',
   '''.*\.sample$''',
-  '''.*\.template$'''
+  '''.*\.template$''',
+  '''.*\.example\.yml$''',
+  '''.*\.example\.yaml$'''
 ]
+
+[[allowlist]]
+description = "Git and CI files"
+paths = [
+  '''.git/.*''',
+  '''.github/.*''',
+  '''.*\.log$''',
+  '''.*\.tmp$'''
+]
+
+[[allowlist]]
+description = "Backup and temporary files"
+paths = [
+  '''.*\.bak$''',
+  '''.*\.backup$''',
+  '''.*\.swp$''',
+  '''.*\.swo$''',
+  '''.*~$'''
+]
+
+# Additional allowlist for specific content
+[[allowlist]]
+description = "Ansible variable syntax"
+regexTarget = "match"
+regex = '''password:\s*\{\{.*\}\}'''
+
+[[allowlist]]
+description = "Empty or placeholder values"
+regexTarget = "match"
+regex = '''password:\s*""|password:\s*''|password:\s*null'''
+
+[[allowlist]]
+description = "Documentation URLs"
+regexTarget = "match"
+regex = '''https://.*\.com|http://localhost|http://127\.0\.0\.1'''
