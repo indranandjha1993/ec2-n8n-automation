@@ -1,0 +1,61 @@
+---
+- name: Configure Nginx main configuration
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    backup: yes
+  notify: restart nginx
+  tags: [nginx, config]
+
+- name: Remove default Nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: restart nginx
+  tags: [nginx, config]
+
+- name: Create Nginx configuration for IP-based deployment
+  template:
+    src: ip-based.conf.j2
+    dest: /etc/nginx/sites-available/n8n-ip
+  when: deployment_type == 'ip'
+  notify: restart nginx
+  tags: [nginx, config, ip]
+
+- name: Enable IP-based configuration
+  file:
+    src: /etc/nginx/sites-available/n8n-ip
+    dest: /etc/nginx/sites-enabled/n8n-ip
+    state: link
+  when: deployment_type == 'ip'
+  notify: restart nginx
+  tags: [nginx, config, ip]
+
+- name: Create Nginx configuration for domain-based deployment
+  template:
+    src: domain-based.conf.j2
+    dest: /etc/nginx/sites-available/n8n-domain
+  when: deployment_type == 'domain' and domain_name != ''
+  notify: restart nginx
+  tags: [nginx, config, domain]
+
+- name: Enable domain-based configuration
+  file:
+    src: /etc/nginx/sites-available/n8n-domain
+    dest: /etc/nginx/sites-enabled/n8n-domain
+    state: link
+  when: deployment_type == 'domain' and domain_name != ''
+  notify: restart nginx
+  tags: [nginx, config, domain]
+
+- name: Test Nginx configuration
+  command: nginx -t
+  changed_when: false
+  tags: [nginx, test]
+
+- name: Start and enable Nginx
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+  tags: [nginx]
