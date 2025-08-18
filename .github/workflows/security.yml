@@ -1,0 +1,58 @@
+---
+name: Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run security scan weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Analysis
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Check for secrets with GitLeaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Ansible security scan
+        run: |
+          pip install ansible-lint
+          ansible-galaxy collection install community.general community.postgresql community.grafana
+          
+          # Run ansible-lint with security focus
+          ansible-lint playbooks/ --profile=production
+          
+          # Check for common security issues in Ansible
+          echo "Checking for hardcoded passwords..."
+          grep -r "password.*=" roles/ playbooks/ || echo "No hardcoded passwords found"
+          
+          echo "Checking for insecure permissions..."
+          grep -r "mode.*777\|mode.*666" roles/ playbooks/ || echo "No insecure permissions found"

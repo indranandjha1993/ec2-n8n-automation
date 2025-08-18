@@ -1,0 +1,22 @@
+# Global code owners - require review for all changes
+* @indranandjha1993
+
+# Critical files require additional scrutiny
+/.github/workflows/ @indranandjha1993
+/playbooks/ @indranandjha1993
+/roles/ @indranandjha1993
+/scripts/ @indranandjha1993
+
+# Documentation changes
+/docs/ @indranandjha1993
+README.md @indranandjha1993
+SECURITY.md @indranandjha1993
+
+# Configuration files
+ansible.cfg @indranandjha1993
+.yamllint @indranandjha1993
+.ansible-lint @indranandjha1993
+
+# Release and CI/CD
+CHANGELOG.md @indranandjha1993
+/.github/workflows/release.yml @indranandjha1993
