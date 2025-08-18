@@ -1,0 +1,8 @@
+#!/bin/bash
+# SSL certificate renewal hook script
+
+# Reload nginx to use new certificates
+systemctl reload nginx
+
+# Log the renewal
+echo "$(date): SSL certificates renewed and nginx reloaded" >> /var/log/ssl-renewal.log

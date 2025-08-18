@@ -1,0 +1,59 @@
+---
+- name: Create webroot directory for certbot
+  file:
+    path: /var/www/certbot
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  when: ssl.enabled
+  tags: [ssl, certbot]
+
+- name: Create basic auth file for Prometheus
+  htpasswd:
+    path: /etc/nginx/.htpasswd
+    name: admin
+    password: "{{ grafana_password }}"
+    owner: root
+    group: www-data
+    mode: '0640'
+  when: ssl.enabled
+  tags: [ssl, auth]
+
+- name: Obtain SSL certificates for subdomains
+  command: >
+    certbot certonly
+    --webroot
+    --webroot-path=/var/www/certbot
+    --email {{ ssl.email }}
+    --agree-tos
+    --no-eff-email
+    {% if ssl.staging %}--staging{% endif %}
+    -d {{ item }}.{{ domain_name }}
+  loop:
+    - "{{ subdomains.n8n }}"
+    - "{{ subdomains.grafana }}"
+    - "{{ subdomains.prometheus }}"
+    - "{{ subdomains.pgadmin }}"
+  when: ssl.enabled
+  register: certbot_result
+  failed_when: certbot_result.rc != 0 and "Certificate not yet due for renewal" not in certbot_result.stdout
+  tags: [ssl, certbot]
+
+- name: Set up SSL certificate renewal cron job
+  cron:
+    name: "Renew SSL certificates"
+    minute: "0"
+    hour: "2"
+    job: "certbot renew --quiet && systemctl reload nginx"
+    user: root
+  when: ssl.enabled
+  tags: [ssl, certbot, cron]
+
+- name: Create SSL renewal hook script
+  template:
+    src: renewal-hook.sh.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/nginx-reload.sh
+    mode: '0755'
+  when: ssl.enabled
+  tags: [ssl, certbot]
