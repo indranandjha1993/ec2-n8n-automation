@@ -1,0 +1,33 @@
+---
+- name: Install Redis
+  apt:
+    name:
+      - redis-server
+      - redis-tools
+    state: present
+  tags: [redis, cache]
+
+- name: Configure Redis
+  template:
+    src: redis.conf.j2
+    dest: /etc/redis/redis.conf
+    owner: redis
+    group: redis
+    mode: '0640'
+    backup: yes
+  notify: restart redis
+  tags: [redis, config]
+
+- name: Start and enable Redis
+  systemd:
+    name: redis-server
+    state: started
+    enabled: yes
+  tags: [redis, cache]
+
+- name: Test Redis connection
+  command: redis-cli -a "{{ redis.password }}" ping
+  register: redis_ping
+  changed_when: false
+  failed_when: redis_ping.stdout != "PONG"
+  tags: [redis, test]
