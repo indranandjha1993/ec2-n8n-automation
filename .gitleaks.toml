@@ -1,0 +1,108 @@
+# GitLeaks configuration for n8n deployment automation
+
+title = "GitLeaks Config for n8n Deployment"
+
+[extend]
+# Extend default rules
+useDefault = true
+
+[[rules]]
+id = "ansible-vault-password"
+description = "Ansible Vault Password"
+regex = '''vault_password\s*=\s*['""][^'""]+['""]'''
+tags = ["ansible", "password"]
+
+[[rules]]
+id = "database-password"
+description = "Database Password"
+regex = '''(?i)(db_password|database_password|postgres_password)\s*[:=]\s*['""][a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,}['""]'''
+tags = ["database", "password"]
+
+[[rules]]
+id = "api-key"
+description = "API Key"
+regex = '''(?i)(api_key|apikey|api-key)\s*[:=]\s*['""][a-zA-Z0-9]{16,}['""]'''
+tags = ["api", "key"]
+
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN\s+(RSA\s+)?PRIVATE KEY-----'''
+tags = ["private", "key"]
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key"
+regex = '''AKIA[0-9A-Z]{16}'''
+tags = ["aws", "key"]
+
+[[rules]]
+id = "aws-secret-key"
+description = "AWS Secret Key"
+regex = '''(?i)aws_secret_access_key\s*[:=]\s*['""][a-zA-Z0-9/+=]{40}['""]'''
+tags = ["aws", "secret"]
+
+# Allowlist configuration for newer GitLeaks versions
+[allowlist]
+description = "Allowlist for false positives"
+regexes = [
+  # Example configurations and placeholders
+  '''example\.com|your-domain\.com|your-ec2-ip|admin@example\.com|yourdomain\.com|demo\.com''',
+  
+  # Template variables and Ansible syntax
+  '''\{\{.*\}\}|\[generated\]|\[auto-generated\]''',
+  
+  # Documentation examples and placeholders
+  '''password.*=.*""|password.*=.*\[\]|password.*=.*\[generated\]|password.*=.*\[auto-generated\]''',
+  
+  # Default example values and placeholders
+  '''admin@example\.com|your-key\.pem|your-backup-bucket|your-server-ip|localhost|127\.0\.0\.1''',
+  
+  # Common placeholder passwords
+  '''password.*=.*"changeme"|password.*=.*"password"|password.*=.*"admin"|password.*=.*"root"''',
+  
+  # Configuration file comments
+  '''^\s*#.*''',
+  
+  # YAML comments
+  '''^\s*#.*|.*#.*password.*example''',
+  
+  # Ansible variable syntax
+  '''password:\s*\{\{.*\}\}''',
+  
+  # Empty or placeholder values
+  '''password:\s*""|password:\s*''|password:\s*null''',
+  
+  # Documentation URLs
+  '''https://.*\.com|http://localhost|http://127\.0\.0\.1'''
+]
+
+paths = [
+  # Documentation files
+  '''.*\.md$''',
+  '''.*\.rst$''',
+  '''.*\.txt$''',
+  '''CHANGELOG.*''',
+  '''LICENSE.*''',
+  '''README.*''',
+  
+  # Configuration examples and templates
+  '''.*\.example$''',
+  '''.*\.sample$''',
+  '''.*\.template$''',
+  '''.*\.example\.yml$''',
+  '''.*\.example\.yaml$''',
+  
+  # Git and CI files
+  '''.git/.*''',
+  '''.github/.*''',
+  '''.*\.log$''',
+  '''.*\.tmp$''',
+  
+  # Backup and temporary files
+  '''.*\.bak$''',
+  '''.*\.backup$''',
+  '''.*\.swp$''',
+  '''.*\.swo$''',
+  '''.*~$'''
+]
