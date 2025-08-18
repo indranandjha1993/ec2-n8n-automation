@@ -5,27 +5,28 @@
 We actively support the following versions with security updates:
 
 | Version | Supported          |
-| ------- | ------------------ |
+|---------|--------------------|
 | 1.1.x   | :white_check_mark: |
 | 1.0.x   | :x:                |
 
 ## Reporting a Vulnerability
 
-We take security vulnerabilities seriously. If you discover a security vulnerability in this project, please follow these steps:
+We take security vulnerabilities seriously. If you discover a security vulnerability in this project, please follow
+these steps:
 
 ### 🚨 **DO NOT** create a public GitHub issue for security vulnerabilities
 
 ### ✅ **DO** report privately using one of these methods:
 
 1. **GitHub Security Advisories** (Preferred)
-   - Go to the repository's Security tab
-   - Click "Report a vulnerability"
-   - Fill out the private vulnerability report
+    - Go to the repository's Security tab
+    - Click "Report a vulnerability"
+    - Fill out the private vulnerability report
 
 2. **Email** (Alternative)
-   - Send details to: [your-security-email@domain.com]
-   - Include "SECURITY" in the subject line
-   - Provide detailed information about the vulnerability
+    - Send details to: indranandjha1993@gmail.com
+    - Include "SECURITY" in the subject line
+    - Provide detailed information about the vulnerability
 
 ### 📋 **What to Include in Your Report**
 
@@ -56,6 +57,7 @@ We take security vulnerabilities seriously. If you discover a security vulnerabi
 For comprehensive security guidelines, see our [Security Guidelines](docs/SECURITY_GUIDELINES.md).
 
 #### Quick Security Checklist:
+
 - [ ] Never commit secrets, passwords, or API keys
 - [ ] Use Ansible Vault for sensitive configuration data
 - [ ] Implement proper input validation
@@ -67,6 +69,7 @@ For comprehensive security guidelines, see our [Security Guidelines](docs/SECURI
 ### 🔍 **Automated Security Scanning**
 
 This repository includes automated security scanning:
+
 - **GitLeaks**: Scans for secrets and credentials
 - **Trivy**: Vulnerability scanning for dependencies
 - **Ansible-lint**: Security-focused linting for Ansible code
@@ -87,7 +90,7 @@ We appreciate security researchers who help improve our project's security:
 
 ### 📞 **Contact Information**
 
-- **Security Team**: [your-security-email@domain.com]
+- **Security Team**: indranandjha1993@gmail.com
 - **Maintainer**: [@indranandjha1993](https://github.com/indranandjha1993)
 
 ### 🔄 **Policy Updates**

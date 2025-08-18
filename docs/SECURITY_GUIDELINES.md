@@ -126,7 +126,7 @@ If you discover a security vulnerability, please follow our [Security Policy](..
 
 **Do not create public issues for security vulnerabilities.**
 
-Contact: [Your security contact information]
+Contact: indranandjha1993@gmail.com
 
 ## 🔄 Updates
 
