@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3] - 2025-08-18
+
+### Fixed
+- .yamllint configuration compatibility with ansible-lint requirements
+- Unsupported 'when' conditions in vars_prompt structure causing schema errors
+- Duplicate 'private' key in vars_prompt causing YAML validation failures
+- Module resolution error for timezone module by using FQCN
+
+### Added
+- .ansible-lint configuration to focus on critical issues while skipping cosmetic rules
+- Production-grade ansible-lint compliance for reliable CI/CD pipeline
+
+### Improved
+- YAML compatibility across all configuration files
+- Code quality standards while maintaining functionality
+- CI/CD pipeline reliability with passing ansible-lint checks
+
 ## [1.1.2] - 2025-08-18
 
 ### Added
