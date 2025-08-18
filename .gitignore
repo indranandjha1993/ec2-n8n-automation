@@ -112,14 +112,15 @@ custom.yml
 *.pid
 *.sock
 
-# SSL certificates (except examples)
-ssl/
-certs/
+# SSL certificates (except examples and role templates)
+/ssl/
+/certs/
 *.csr
 *.crt
 *.key
 !examples/*.crt
 !examples/*.key
+!roles/ssl/
 
 # Backup directories
 backups/
