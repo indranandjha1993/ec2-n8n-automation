@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.5] - 2025-08-18
+
+### Fixed
+- Missing document start marker (---) in .yamllint configuration file
+- Trailing spaces in release workflow causing yamllint errors
+- Final YAML formatting inconsistencies across workflow files
+
+### Improved
+- Complete YAML linting compliance with zero errors
+- Consistent formatting standards across all configuration files
+- CI/CD pipeline reliability with all quality checks passing
+
+### Completed
+- Full CI/CD pipeline implementation with comprehensive quality gates
+- Production-ready code quality standards across entire project
+- Reliable automated release process with clean distribution archives
+
 ## [1.1.4] - 2025-08-18
 
 ### Fixed
