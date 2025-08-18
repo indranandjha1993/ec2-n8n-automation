@@ -1,0 +1,116 @@
+---
+- name: Install Node.js repository
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+  tags: [nodejs, n8n]
+
+- name: Install Node.js
+  apt:
+    name: nodejs
+    state: present
+    update_cache: yes
+  tags: [nodejs, n8n]
+
+- name: Install global npm packages
+  npm:
+    name: "{{ item }}"
+    global: yes
+  loop:
+    - n8n@{{ n8n.version }}
+    - pm2
+  tags: [nodejs, n8n]
+
+- name: Create n8n configuration
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ n8n.home_dir }}/.n8n/{{ item }}"
+    owner: "{{ n8n.user }}"
+    group: "{{ n8n.group }}"
+    mode: '0600'
+  loop:
+    - config.json
+  notify: restart n8n
+  tags: [n8n, config]
+
+- name: Create n8n environment file
+  template:
+    src: n8n.env.j2
+    dest: "{{ n8n.home_dir }}/.n8n/.env"
+    owner: "{{ n8n.user }}"
+    group: "{{ n8n.group }}"
+    mode: '0600'
+  notify: restart n8n
+  tags: [n8n, config]
+
+- name: Create PM2 ecosystem file
+  template:
+    src: ecosystem.config.js.j2
+    dest: "{{ n8n.home_dir }}/ecosystem.config.js"
+    owner: "{{ n8n.user }}"
+    group: "{{ n8n.group }}"
+    mode: '0644'
+  notify: restart n8n
+  tags: [n8n, pm2]
+
+- name: Initialize n8n database
+  command: n8n init --force
+  become_user: "{{ n8n.user }}"
+  environment:
+    N8N_CONFIG_FILE: "{{ n8n.home_dir }}/.n8n/config.json"
+    HOME: "{{ n8n.home_dir }}"
+  args:
+    creates: "{{ n8n.home_dir }}/.n8n/.initialized"
+  tags: [n8n, database]
+
+- name: Create initialization marker
+  file:
+    path: "{{ n8n.home_dir }}/.n8n/.initialized"
+    state: touch
+    owner: "{{ n8n.user }}"
+    group: "{{ n8n.group }}"
+  tags: [n8n, database]
+
+- name: Start n8n with PM2
+  command: pm2 start {{ n8n.home_dir }}/ecosystem.config.js
+  become_user: "{{ n8n.user }}"
+  environment:
+    PM2_HOME: "{{ n8n.home_dir }}/.pm2"
+    HOME: "{{ n8n.home_dir }}"
+  register: pm2_start
+  failed_when: pm2_start.rc != 0 and "already running" not in pm2_start.stderr
+  tags: [n8n, pm2]
+
+- name: Save PM2 configuration
+  command: pm2 save
+  become_user: "{{ n8n.user }}"
+  environment:
+    PM2_HOME: "{{ n8n.home_dir }}/.pm2"
+    HOME: "{{ n8n.home_dir }}"
+  tags: [n8n, pm2]
+
+- name: Generate PM2 startup script
+  command: pm2 startup systemd -u {{ n8n.user }} --hp {{ n8n.home_dir }}
+  register: pm2_startup
+  tags: [n8n, pm2]
+
+- name: Execute PM2 startup command
+  shell: "{{ pm2_startup.stdout }}"
+  when: pm2_startup.stdout is defined and pm2_startup.stdout != ""
+  tags: [n8n, pm2]
+
+- name: Create n8n health check script
+  template:
+    src: health-check.sh.j2
+    dest: /usr/local/bin/n8n-health-check.sh
+    mode: '0755'
+  tags: [n8n, monitoring]
+
+- name: Set up health check cron job
+  cron:
+    name: "n8n health check"
+    minute: "*/5"
+    job: "/usr/local/bin/n8n-health-check.sh"
+    user: root
+  tags: [n8n, monitoring]

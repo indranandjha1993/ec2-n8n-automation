@@ -1,0 +1,79 @@
+{
+  "database": {
+    "type": "postgresdb",
+    "postgresdb": {
+      "host": "localhost",
+      "port": {{ postgresql.port }},
+      "database": "{{ postgresql.database }}",
+      "username": "{{ postgresql.user }}",
+      "password": "{{ postgresql.password }}",
+      "schema": "public",
+      "ssl": false
+    }
+  },
+  "queue": {
+    "bull": {
+      "redis": {
+        "host": "localhost",
+        "port": {{ redis.port }},
+        "password": "{{ redis.password }}"
+      }
+    }
+  },
+  "executions": {
+    "process": "queue",
+    "timeout": {{ n8n.max_execution_timeout }},
+    "maxTimeout": {{ n8n.max_execution_timeout }},
+    "saveDataOnError": "all",
+    "saveDataOnSuccess": "all",
+    "saveDataManualExecutions": true,
+    "pruneData": true,
+    "pruneDataMaxAge": 336,
+    "pruneDataTimeout": 3600
+  },
+  "generic": {
+    "timezone": "{{ n8n.timezone }}"
+  },
+  "path": "/",
+  "host": "0.0.0.0",
+  "port": {{ n8n.port }},
+  "protocol": "http",
+  "defaultLocale": "en",
+  "onboardingFlowDisabled": false,
+  "diagnosticsEnabled": true,
+  "versionNotificationsEnabled": true,
+  "templatesEnabled": true,
+  "publicApi": {
+    "disabled": false,
+    "path": "api"
+  },
+{% if n8n.basic_auth.enabled %}
+  "security": {
+    "basicAuth": {
+      "active": true,
+      "user": "{{ n8n.basic_auth.user }}",
+      "password": "{{ n8n.basic_auth.password }}"
+    }
+  },
+{% endif %}
+  "endpoints": {
+    "rest": "rest",
+    "webhook": "webhook",
+    "webhookWaiting": "webhook-waiting",
+    "webhookTest": "webhook-test",
+    "payloadSizeMax": 16,
+    "metrics": {
+      "enable": true,
+      "prefix": "n8n_"
+    }
+  },
+  "logs": {
+    "level": "{{ n8n.log_level }}",
+    "output": "file",
+    "file": {
+      "fileCountMax": 100,
+      "fileSizeMax": 16,
+      "location": "/var/log/n8n/n8n.log"
+    }
+  }
+}

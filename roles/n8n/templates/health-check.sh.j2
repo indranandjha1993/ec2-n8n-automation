@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# n8n Health Check Script
+LOG_FILE="/var/log/n8n/health-check.log"
+N8N_URL="http://localhost:{{ n8n.port }}"
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+
+# Function to log messages
+log_message() {
+    echo "[$TIMESTAMP] $1" >> "$LOG_FILE"
+}
+
+# Check if n8n is responding
+if curl -f -s "$N8N_URL" > /dev/null; then
+    log_message "n8n is healthy"
+    exit 0
+else
+    log_message "n8n is not responding, attempting restart"
+    
+    # Try to restart n8n via PM2
+    su - {{ n8n.user }} -c "cd {{ n8n.home_dir }} && pm2 restart n8n"
+    
+    # Wait a bit and check again
+    sleep 10
+    
+    if curl -f -s "$N8N_URL" > /dev/null; then
+        log_message "n8n restarted successfully"
+        exit 0
+    else
+        log_message "n8n restart failed"
+        exit 1
+    fi
+fi

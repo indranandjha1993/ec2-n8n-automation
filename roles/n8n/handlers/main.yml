@@ -1,0 +1,5 @@
+---
+- name: restart n8n
+  shell: |
+    su - {{ n8n.user }} -c "cd {{ n8n.home_dir }} && pm2 reload ecosystem.config.js"
+  ignore_errors: yes
