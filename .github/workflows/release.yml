@@ -62,10 +62,10 @@ jobs:
           # Extract version from tag
           VERSION=${GITHUB_REF#refs/tags/}
           ARCHIVE_NAME="ec2-n8n-automation-$VERSION.tar.gz"
-          
+
           # Create a temporary directory for clean archiving
           mkdir -p /tmp/release-archive
-          
+
           # Copy files to temporary directory, excluding unwanted files
           rsync -av \
             --exclude='.git*' \
@@ -77,14 +77,14 @@ jobs:
             --exclude='.DS_Store' \
             --exclude='Thumbs.db' \
             . /tmp/release-archive/
-          
+
           # Create archive from temporary directory
           cd /tmp/release-archive
           tar -czf "$GITHUB_WORKSPACE/$ARCHIVE_NAME" .
-          
+
           # Move back to workspace
           cd "$GITHUB_WORKSPACE"
-          
+
           # Verify archive was created
           ls -la "$ARCHIVE_NAME"
           echo "Archive created: $ARCHIVE_NAME"
