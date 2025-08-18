@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.4] - 2025-08-18
+
+### Fixed
+- Release workflow 'file changed as we read it' error during tar archive creation
+- Concurrent file operations causing archive creation failures in CI/CD pipeline
+- Archive creation process reliability and error handling
+
+### Improved
+- Use rsync for clean file copying before archive creation
+- Add comprehensive file exclusions for cleaner distribution archives
+- Better logging and verification of archive creation process
+- More reliable automated release workflow execution
+
+### Added
+- Temporary directory approach for safe archive creation
+- Enhanced file exclusion patterns for development files
+- Improved error handling in release workflow steps
+
 ## [1.1.3] - 2025-08-18
 
 ### Fixed
