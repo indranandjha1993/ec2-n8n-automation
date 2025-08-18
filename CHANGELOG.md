@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2025-08-18
+
+### Fixed
+- YAML formatting errors in Ansible tasks and playbooks
+- Trailing spaces in all YAML files causing linting failures
+- Missing document start markers in GitHub workflow files
+- Indentation issues in CI/CD workflow configurations
+- Long lines in Ansible tasks using YAML folded scalars
+
+### Improved
+- CI/CD pipeline reliability by resolving yamllint errors
+- Code quality and consistency across all YAML files
+- Maintainability of Ansible playbooks and roles
+
 ## [1.1.0] - 2025-08-18
 
 ### Added
