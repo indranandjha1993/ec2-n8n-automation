@@ -26,6 +26,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible ansible-lint yamllint
 
+      - name: Install Ansible collections
+        run: |
+          ansible-galaxy collection install community.general
+          ansible-galaxy collection install community.postgresql
+          ansible-galaxy collection install community.grafana
+
       - name: Run tests
         run: |
           yamllint .
@@ -53,13 +59,35 @@ jobs:
 
       - name: Create Release Archive
         run: |
-          # Create release archive excluding unnecessary files
-          tar -czf ec2-n8n-automation-${GITHUB_REF#refs/tags/}.tar.gz \
+          # Extract version from tag
+          VERSION=${GITHUB_REF#refs/tags/}
+          ARCHIVE_NAME="ec2-n8n-automation-$VERSION.tar.gz"
+          
+          # Create a temporary directory for clean archiving
+          mkdir -p /tmp/release-archive
+          
+          # Copy files to temporary directory, excluding unwanted files
+          rsync -av \
             --exclude='.git*' \
             --exclude='.idea' \
             --exclude='*.tar.gz' \
             --exclude='node_modules' \
-            .
+            --exclude='.pytest_cache' \
+            --exclude='__pycache__' \
+            --exclude='.DS_Store' \
+            --exclude='Thumbs.db' \
+            . /tmp/release-archive/
+          
+          # Create archive from temporary directory
+          cd /tmp/release-archive
+          tar -czf "$GITHUB_WORKSPACE/$ARCHIVE_NAME" .
+          
+          # Move back to workspace
+          cd "$GITHUB_WORKSPACE"
+          
+          # Verify archive was created
+          ls -la "$ARCHIVE_NAME"
+          echo "Archive created: $ARCHIVE_NAME"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
