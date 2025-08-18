@@ -1,0 +1,34 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^http://localhost"
+    },
+    {
+      "pattern": "^https://localhost"
+    },
+    {
+      "pattern": "^http://your-ec2-ip"
+    },
+    {
+      "pattern": "^https://.*\\.yourdomain\\.com"
+    },
+    {
+      "pattern": "^http://demo-ip"
+    }
+  ],
+  "timeout": "20s",
+  "retryOn429": true,
+  "retryCount": 3,
+  "fallbackHttpStatus": [
+    400,
+    401,
+    403,
+    404,
+    408,
+    429,
+    500,
+    502,
+    503,
+    504
+  ]
+}

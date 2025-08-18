@@ -1,0 +1,34 @@
+name: Documentation Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  docs-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check for broken links
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        use-quiet-mode: 'yes'
+        use-verbose-mode: 'yes'
+        config-file: '.github/workflows/markdown-link-check-config.json'
+        
+    - name: Validate README structure
+      run: |
+        # Check if required sections exist in README
+        sections=("Overview" "Features" "Prerequisites" "Quick Start" "Configuration" "Troubleshooting")
+        for section in "${sections[@]}"; do
+          if ! grep -q "## .*$section" README.md; then
+            echo "Missing section: $section"
+            exit 1
+          fi
+        done
+        echo "All required sections found in README.md"
