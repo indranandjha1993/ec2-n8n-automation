@@ -26,7 +26,7 @@ jobs:
       - name: Check documentation structure
         run: |
           echo "Checking documentation structure..."
-          
+
           # Check if required documentation files exist
           REQUIRED_DOCS=(
             "README.md"
@@ -42,14 +42,14 @@ jobs:
             "docs/MAINTENANCE.md"
             "docs/TROUBLESHOOTING.md"
           )
-          
+
           MISSING_DOCS=()
           for doc in "${REQUIRED_DOCS[@]}"; do
             if [ ! -f "$doc" ]; then
               MISSING_DOCS+=("$doc")
             fi
           done
-          
+
           if [ ${#MISSING_DOCS[@]} -gt 0 ]; then
             echo "❌ Missing required documentation files:"
             printf '%s\n' "${MISSING_DOCS[@]}"
@@ -57,7 +57,7 @@ jobs:
           else
             echo "✅ All required documentation files are present"
           fi
-          
+
           # Check if documentation files are not empty
           echo "Checking documentation content..."
           for doc in "${REQUIRED_DOCS[@]}"; do
@@ -66,6 +66,6 @@ jobs:
               exit 1
             fi
           done
-          
+
           echo "✅ All documentation files have content"
           echo "📚 Documentation structure check completed successfully!"
