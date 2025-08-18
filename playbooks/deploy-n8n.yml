@@ -3,29 +3,29 @@
   hosts: n8n_servers
   become: yes
   gather_facts: yes
-  
+
   vars_prompt:
     - name: deployment_type
       prompt: "Deployment type (domain/ip)"
       default: "ip"
       private: no
-    
+
     - name: domain_name
       prompt: "Domain name (leave empty for IP-based deployment)"
       default: ""
       private: no
       when: deployment_type == "domain"
-    
+
     - name: admin_email
       prompt: "Admin email address"
       default: "admin@example.com"
       private: no
-    
+
     - name: target_host
       prompt: "Target host IP or hostname (localhost for local deployment)"
       default: "localhost"
       private: no
-    
+
     - name: target_user
       prompt: "SSH user for remote deployment"
       default: "ubuntu"
@@ -38,13 +38,13 @@
         msg: "deployment_type must be either 'domain' or 'ip'"
       when: deployment_type not in ['domain', 'ip']
       tags: [always]
-    
+
     - name: Validate domain name for domain deployment
       fail:
         msg: "domain_name is required for domain-based deployment"
       when: deployment_type == 'domain' and (domain_name is not defined or domain_name == '')
       tags: [always]
-    
+
     - name: Display deployment information
       debug:
         msg: |
@@ -54,7 +54,7 @@
           - Target: {{ target_host }}
           - SSL: {{ 'Enabled' if deployment_type == 'domain' and domain_name != '' else 'Disabled' }}
       tags: [always]
-    
+
     - name: Wait for system to be ready
       wait_for_connection:
         timeout: 300
@@ -64,23 +64,23 @@
   roles:
     - role: common
       tags: [common, system]
-    
+
     - role: postgresql
       tags: [postgresql, database]
-    
+
     - role: redis
       tags: [redis, cache]
-    
+
     - role: n8n
       tags: [n8n, application]
-    
+
     - role: nginx
       tags: [nginx, proxy]
-    
+
     - role: ssl
       tags: [ssl, certificates]
       when: deployment_type == 'domain' and domain_name != ''
-    
+
     - role: monitoring
       tags: [monitoring, metrics]
 
@@ -95,19 +95,19 @@
       retries: 30
       delay: 10
       tags: [health-check]
-    
+
     - name: Display deployment summary
       debug:
         msg: |
           🎉 n8n deployment completed successfully!
-          
+
           {% if deployment_type == 'domain' and domain_name != '' %}
           🌐 Domain-based HTTPS deployment:
           - n8n: https://{{ subdomains.n8n }}.{{ domain_name }}
           - Grafana: https://{{ subdomains.grafana }}.{{ domain_name }}
           - Prometheus: https://{{ subdomains.prometheus }}.{{ domain_name }}
           - pgAdmin: https://{{ subdomains.pgadmin }}.{{ domain_name }}
-          
+
           📋 Credentials:
           - n8n: {{ n8n.basic_auth.user }} / {{ n8n_password }}
           - Grafana: {{ monitoring.grafana.admin_user }} / {{ grafana_password }}
@@ -119,19 +119,19 @@
           - Grafana: http://{{ ansible_default_ipv4.address }}:{{ service_ports.grafana }}
           - Prometheus: http://{{ ansible_default_ipv4.address }}:{{ service_ports.prometheus }}
           - pgAdmin: http://{{ ansible_default_ipv4.address }}:{{ service_ports.pgadmin }}
-          
+
           📋 Credentials:
           - n8n: {{ n8n.basic_auth.user }} / {{ n8n_password }}
           - Grafana: {{ monitoring.grafana.admin_user }} / {{ grafana_password }}
           - pgAdmin: {{ pgadmin.email }} / {{ pgadmin_password }}
           {% endif %}
-          
+
           🔧 System Information:
           - PostgreSQL: localhost:{{ postgresql.port }}
           - Redis: localhost:{{ redis.port }}
           - Logs: /var/log/n8n/
           - Backups: {{ backup.local_path }}
-          
+
           📚 Next Steps:
           1. Configure your workflows in n8n
           2. Set up monitoring alerts in Grafana
@@ -144,27 +144,27 @@
       systemd:
         name: chrony
         state: restarted
-    
+
     - name: restart fail2ban
       systemd:
         name: fail2ban
         state: restarted
-    
+
     - name: restart postgresql
       systemd:
         name: postgresql
         state: restarted
-    
+
     - name: restart redis
       systemd:
         name: redis-server
         state: restarted
-    
+
     - name: restart nginx
       systemd:
         name: nginx
         state: restarted
-    
+
     - name: restart n8n
       shell: |
         su - {{ n8n.user }} -c "cd {{ n8n.home_dir }} && pm2 reload ecosystem.config.js"

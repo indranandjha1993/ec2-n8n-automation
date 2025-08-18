@@ -1,43 +1,44 @@
+---
 name: Ansible Lint
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   ansible-lint:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install ansible ansible-lint yamllint
-        
-    - name: Install Ansible collections
-      run: |
-        ansible-galaxy collection install community.general
-        ansible-galaxy collection install community.postgresql
-        ansible-galaxy collection install community.grafana
-        
-    - name: Run yamllint
-      run: yamllint .
-      
-    - name: Run ansible-lint
-      run: ansible-lint playbooks/
-      
-    - name: Syntax check playbooks
-      run: |
-        for playbook in playbooks/*.yml; do
-          ansible-playbook --syntax-check "$playbook"
-        done
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible ansible-lint yamllint
+
+      - name: Install Ansible collections
+        run: |
+          ansible-galaxy collection install community.general
+          ansible-galaxy collection install community.postgresql
+          ansible-galaxy collection install community.grafana
+
+      - name: Run yamllint
+        run: yamllint .
+
+      - name: Run ansible-lint
+        run: ansible-lint playbooks/
+
+      - name: Syntax check playbooks
+        run: |
+          for playbook in playbooks/*.yml; do
+            ansible-playbook --syntax-check "$playbook"
+          done

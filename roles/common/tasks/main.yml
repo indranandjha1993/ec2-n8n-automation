@@ -57,14 +57,14 @@
     src: "{{ item.src | default('any') }}"
     comment: "{{ item.comment | default(omit) }}"
   loop:
-    - { rule: "allow", port: "{{ security.ssh_port }}", comment: "SSH access" }
-    - { rule: "allow", port: "80", comment: "HTTP" }
-    - { rule: "allow", port: "443", comment: "HTTPS" }
+    - {rule: "allow", port: "{{security.ssh_port}}", comment: "SSH access"}
+    - {rule: "allow", port: "80", comment: "HTTP"}
+    - {rule: "allow", port: "443", comment: "HTTPS"}
     # IP-based deployment ports
-    - { rule: "allow", port: "{{ service_ports.n8n }}", comment: "n8n direct access" }
-    - { rule: "allow", port: "{{ service_ports.grafana }}", comment: "Grafana direct access" }
-    - { rule: "allow", port: "{{ service_ports.prometheus }}", comment: "Prometheus direct access" }
-    - { rule: "allow", port: "{{ service_ports.pgadmin }}", comment: "pgAdmin direct access" }
+    - {rule: "allow", port: "{{service_ports.n8n}}", comment: "n8n direct access"}
+    - {rule: "allow", port: "{{service_ports.grafana}}", comment: "Grafana direct access"}
+    - {rule: "allow", port: "{{service_ports.prometheus}}", comment: "Prometheus direct access"}
+    - {rule: "allow", port: "{{service_ports.pgadmin}}", comment: "pgAdmin direct access"}
   when: security.ufw_enabled
   tags: [security, firewall]
 
@@ -113,12 +113,12 @@
     group: "{{ item.group | default('root') }}"
     mode: "{{ item.mode | default('0755') }}"
   loop:
-    - { path: "{{ n8n.home_dir }}", owner: "{{ n8n.user }}", group: "{{ n8n.group }}" }
-    - { path: "{{ n8n.home_dir }}/.n8n", owner: "{{ n8n.user }}", group: "{{ n8n.group }}", mode: "0750" }
-    - { path: "{{ n8n.home_dir }}/logs", owner: "{{ n8n.user }}", group: "{{ n8n.group }}" }
-    - { path: "/var/log/n8n", owner: "{{ n8n.user }}", group: "{{ n8n.group }}" }
-    - { path: "{{ backup.local_path }}", mode: "0750" }
-    - { path: "/etc/nginx/ssl", mode: "0700" }
+    - {path: "{{n8n.home_dir}}", owner: "{{n8n.user}}", group: "{{n8n.group}}"}
+    - {path: "{{n8n.home_dir}}/.n8n", owner: "{{n8n.user}}", group: "{{n8n.group}}", mode: "0750"}
+    - {path: "{{n8n.home_dir}}/logs", owner: "{{n8n.user}}", group: "{{n8n.group}}"}
+    - {path: "/var/log/n8n", owner: "{{n8n.user}}", group: "{{n8n.group}}"}
+    - {path: "{{backup.local_path}}", mode: "0750"}
+    - {path: "/etc/nginx/ssl", mode: "0700"}
   tags: [system, directories]
 
 - name: Set up log rotation for n8n
@@ -129,11 +129,16 @@
 
 - name: Generate secure passwords if not provided
   set_fact:
-    db_password: "{{ db_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=32')) }}"
-    redis_password: "{{ redis_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=32')) }}"
-    n8n_password: "{{ n8n_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=16')) }}"
-    grafana_password: "{{ grafana_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=16')) }}"
-    pgadmin_password: "{{ pgadmin_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=16')) }}"
+    db_password: >-
+      {{db_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=32'))}}
+    redis_password: >-
+      {{redis_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=32'))}}
+    n8n_password: >-
+      {{n8n_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=16'))}}
+    grafana_password: >-
+      {{grafana_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=16'))}}
+    pgadmin_password: >-
+      {{pgadmin_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=16'))}}
   no_log: true
   tags: [security, passwords]
 
@@ -141,12 +146,12 @@
   debug:
     msg: |
       Generated passwords (save these securely):
-      - Database password: {{ db_password }}
-      - Redis password: {{ redis_password }}
-      - n8n password: {{ n8n_password }}
-      - Grafana password: {{ grafana_password }}
-      - pgAdmin password: {{ pgadmin_password }}
-  when: 
+      - Database password: {{db_password}}
+      - Redis password: {{redis_password}}
+      - n8n password: {{n8n_password}}
+      - Grafana password: {{grafana_password}}
+      - pgAdmin password: {{pgadmin_password}}
+  when:
     - db_password is defined
     - redis_password is defined
   tags: [security, passwords]
