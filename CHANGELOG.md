@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-08-18
+
+### Added
+- Complete GitHub integration with issue templates for bugs, features, and deployment help
+- Automated CI/CD pipeline with GitHub workflows for Ansible linting and documentation checks
+- Automated release management workflow triggered by version tags
+- Pull request template for standardized contributions
+- Security policy with vulnerability reporting process
+- Funding configuration for project sustainability
+- Comprehensive .gitignore patterns for clean repository
+- YAML linting configuration for code quality
+- Professional repository structure with organized documentation
+
+### Improved
+- Repository cleanup removing unrelated files and IDE configurations
+- Enhanced documentation structure in dedicated `docs/` folder
+- Better organization of GitHub templates and workflows
+- Streamlined contribution process with clear guidelines
+
+### Fixed
+- Repository structure for professional open-source standards
+- Documentation links and cross-references
+- Code quality checks and automated testing
+
 ### Added
 - Initial release of n8n EC2 deployment automation
 - Dual deployment modes (IP-based and domain-based)
