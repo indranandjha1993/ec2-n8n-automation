@@ -42,95 +42,67 @@ description = "AWS Secret Key"
 regex = '''(?i)aws_secret_access_key\s*[:=]\s*['""][a-zA-Z0-9/+=]{40}['""]'''
 tags = ["aws", "secret"]
 
-# Comprehensive allowlist for false positives
-[[allowlist]]
-description = "Example configurations and placeholders"
-regexTarget = "match"
-regex = '''example\.com|your-domain\.com|your-ec2-ip|admin@example\.com|yourdomain\.com|demo\.com'''
+# Allowlist configuration for newer GitLeaks versions
+[allowlist]
+description = "Allowlist for false positives"
+regexes = [
+  # Example configurations and placeholders
+  '''example\.com|your-domain\.com|your-ec2-ip|admin@example\.com|yourdomain\.com|demo\.com''',
+  
+  # Template variables and Ansible syntax
+  '''\{\{.*\}\}|\[generated\]|\[auto-generated\]''',
+  
+  # Documentation examples and placeholders
+  '''password.*=.*""|password.*=.*\[\]|password.*=.*\[generated\]|password.*=.*\[auto-generated\]''',
+  
+  # Default example values and placeholders
+  '''admin@example\.com|your-key\.pem|your-backup-bucket|your-server-ip|localhost|127\.0\.0\.1''',
+  
+  # Common placeholder passwords
+  '''password.*=.*"changeme"|password.*=.*"password"|password.*=.*"admin"|password.*=.*"root"''',
+  
+  # Configuration file comments
+  '''^\s*#.*''',
+  
+  # YAML comments
+  '''^\s*#.*|.*#.*password.*example''',
+  
+  # Ansible variable syntax
+  '''password:\s*\{\{.*\}\}''',
+  
+  # Empty or placeholder values
+  '''password:\s*""|password:\s*''|password:\s*null''',
+  
+  # Documentation URLs
+  '''https://.*\.com|http://localhost|http://127\.0\.0\.1'''
+]
 
-[[allowlist]]
-description = "Template variables and Ansible syntax"
-regexTarget = "match"
-regex = '''\{\{.*\}\}|\[generated\]|\[auto-generated\]'''
-
-[[allowlist]]
-description = "Documentation examples and placeholders"
-regexTarget = "match"
-regex = '''password.*=.*""|password.*=.*\[\]|password.*=.*\[generated\]|password.*=.*\[auto-generated\]'''
-
-[[allowlist]]
-description = "Default example values and placeholders"
-regexTarget = "match"
-regex = '''admin@example\.com|your-key\.pem|your-backup-bucket|your-server-ip|localhost|127\.0\.0\.1'''
-
-[[allowlist]]
-description = "Common placeholder passwords"
-regexTarget = "match"
-regex = '''password.*=.*"changeme"|password.*=.*"password"|password.*=.*"admin"|password.*=.*"root"'''
-
-[[allowlist]]
-description = "Configuration file comments"
-regexTarget = "match"
-regex = '''^\s*#.*'''
-
-[[allowlist]]
-description = "YAML comments"
-regexTarget = "match"
-regex = '''^\s*#.*|.*#.*password.*example'''
-
-# File patterns to ignore
-[[allowlist]]
-description = "Documentation files"
 paths = [
+  # Documentation files
   '''.*\.md$''',
   '''.*\.rst$''',
   '''.*\.txt$''',
   '''CHANGELOG.*''',
   '''LICENSE.*''',
-  '''README.*'''
-]
-
-[[allowlist]]
-description = "Configuration examples and templates"
-paths = [
+  '''README.*''',
+  
+  # Configuration examples and templates
   '''.*\.example$''',
   '''.*\.sample$''',
   '''.*\.template$''',
   '''.*\.example\.yml$''',
-  '''.*\.example\.yaml$'''
-]
-
-[[allowlist]]
-description = "Git and CI files"
-paths = [
+  '''.*\.example\.yaml$''',
+  
+  # Git and CI files
   '''.git/.*''',
   '''.github/.*''',
   '''.*\.log$''',
-  '''.*\.tmp$'''
-]
-
-[[allowlist]]
-description = "Backup and temporary files"
-paths = [
+  '''.*\.tmp$''',
+  
+  # Backup and temporary files
   '''.*\.bak$''',
   '''.*\.backup$''',
   '''.*\.swp$''',
   '''.*\.swo$''',
   '''.*~$'''
 ]
-
-# Additional allowlist for specific content
-[[allowlist]]
-description = "Ansible variable syntax"
-regexTarget = "match"
-regex = '''password:\s*\{\{.*\}\}'''
-
-[[allowlist]]
-description = "Empty or placeholder values"
-regexTarget = "match"
-regex = '''password:\s*""|password:\s*''|password:\s*null'''
-
-[[allowlist]]
-description = "Documentation URLs"
-regexTarget = "match"
-regex = '''https://.*\.com|http://localhost|http://127\.0\.0\.1'''
