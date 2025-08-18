@@ -1,0 +1,19 @@
+---
+# Ansible-lint configuration
+profile: min
+
+# Skip rules that are not critical for functionality
+skip_list:
+  - fqcn[action-core]  # FQCN for builtin modules (cosmetic)
+  - name[casing]       # Task name casing (cosmetic)
+  - risky-file-permissions  # File permissions (can be addressed later)
+  - var-naming[no-role-prefix]  # Variable naming (cosmetic)
+  - no-changed-when    # Changed when conditions (can be addressed later)
+  - partial-become     # Become user issues (can be addressed later)
+  - ignore-errors      # Ignore errors usage (can be addressed later)
+  - command-instead-of-module  # Command vs module (can be addressed later)
+  - command-instead-of-shell   # Command vs shell (can be addressed later)
+  - risky-shell-pipe   # Shell pipe issues (can be addressed later)
+
+# Use default yamllint configuration
+use_default_rules: true

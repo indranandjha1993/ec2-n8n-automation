@@ -30,8 +30,8 @@
   tags: [system, packages]
 
 - name: Configure timezone
-  timezone:
-    name: "{{ n8n.timezone }}"
+  community.general.timezone:
+    name: "{{n8n.timezone}}"
   tags: [system]
 
 - name: Configure chrony for time synchronization

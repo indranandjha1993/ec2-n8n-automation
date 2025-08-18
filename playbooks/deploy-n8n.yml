@@ -14,7 +14,6 @@
       prompt: "Domain name (leave empty for IP-based deployment)"
       default: ""
       private: no
-      when: deployment_type == "domain"
 
     - name: admin_email
       prompt: "Admin email address"
@@ -30,7 +29,6 @@
       prompt: "SSH user for remote deployment"
       default: "ubuntu"
       private: no
-      when: target_host != "localhost"
 
   pre_tasks:
     - name: Validate deployment type
