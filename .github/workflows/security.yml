@@ -116,18 +116,41 @@ jobs:
             echo "Note: Formatting issues (jinja spacing, FQCN) don't affect security"
           fi
 
-          # Check for hardcoded passwords
+          # Check for hardcoded passwords (excluding Ansible password generation)
           echo "Checking for hardcoded passwords..."
+          HARDCODED_FOUND=false
+          
+          # Look for password assignments but exclude legitimate Ansible patterns
           if grep -r "password.*=" roles/ playbooks/ --include="*.yml" \
-             --include="*.yaml" 2>/dev/null | grep -v "password.*{{" | \
-             grep -v "password.*\[\]" | grep -v "password.*\"\"" | \
-             grep -v "password.*\[generated\]" | grep -v "password.*\[auto-generated\]" | \
-             grep -v "password.*changeme" | grep -v "password.*example"; then
-            echo "❌ WARNING: Potential hardcoded passwords found!"
-            echo "Please use variables or Ansible Vault for sensitive data."
-            exit 1
-          else
+             --include="*.yaml" 2>/dev/null | \
+             grep -v "password.*{{" | \
+             grep -v "password.*\[\]" | \
+             grep -v "password.*\"\"" | \
+             grep -v "password.*\[generated\]" | \
+             grep -v "password.*\[auto-generated\]" | \
+             grep -v "password.*changeme" | \
+             grep -v "password.*example" | \
+             grep -v "lookup('password'" | \
+             grep -v "lookup(\"password\"" | \
+             grep -v "default(lookup" | \
+             grep -v "password.*null" | \
+             grep -v "password.*''" | \
+             grep -v "#.*password" > /tmp/password_check.txt; then
+            
+            if [ -s /tmp/password_check.txt ]; then
+              echo "❌ WARNING: Potential hardcoded passwords found!"
+              cat /tmp/password_check.txt
+              echo ""
+              echo "Please use variables or Ansible Vault for sensitive data."
+              HARDCODED_FOUND=true
+            fi
+          fi
+          
+          if [ "$HARDCODED_FOUND" = false ]; then
             echo "✅ No hardcoded passwords found"
+            echo "Note: Ansible password generation functions (lookup('password')) are acceptable"
+          else
+            exit 1
           fi
 
           # Check for insecure permissions
