@@ -1,0 +1,113 @@
+---
+# Example configuration file
+# Copy this to all.yml and customize for your deployment
+
+# Global configuration
+project_name: n8n-deployment
+deployment_type: "ip"  # Change to "domain" for HTTPS setup
+domain_name: ""  # Set your domain for HTTPS deployment
+admin_email: "admin@example.com"
+
+# Application configuration
+n8n:
+  version: latest
+  port: 5678
+  user: n8n
+  group: n8n
+  home_dir: /opt/n8n
+  log_level: info
+  timezone: UTC
+  webhook_timeout: 120
+  max_execution_timeout: 3600
+  basic_auth:
+    enabled: true
+    user: "admin"
+    password: ""  # Will be auto-generated if empty
+
+# Database configuration (PostgreSQL)
+postgresql:
+  version: 14
+  port: 5432
+  database: n8n
+  user: n8n
+  password: ""  # Will be auto-generated if empty
+  max_connections: 100
+  shared_buffers: 256MB
+  effective_cache_size: 1GB
+
+# Redis configuration
+redis:
+  port: 6379
+  password: ""  # Will be auto-generated if empty
+  maxmemory: 256mb
+  maxmemory_policy: allkeys-lru
+
+# Nginx configuration
+nginx:
+  worker_processes: auto
+  worker_connections: 1024
+  client_max_body_size: 50M
+  ssl_protocols: "TLSv1.2 TLSv1.3"
+  ssl_ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
+
+# Monitoring configuration
+monitoring:
+  prometheus:
+    port: 9090
+    retention: 15d
+    scrape_interval: 15s
+  grafana:
+    port: 3000
+    admin_user: admin
+    admin_password: ""  # Will be auto-generated if empty
+  node_exporter:
+    port: 9100
+
+# pgAdmin configuration
+pgadmin:
+  port: 8080
+  email: "admin@example.com"
+  password: ""  # Will be auto-generated if empty
+
+# Security configuration
+security:
+  ufw_enabled: true
+  fail2ban_enabled: true
+  ssh_port: 22
+  allowed_ssh_users: ["ubuntu", "ec2-user", "admin"]
+  max_login_attempts: 5
+  ban_time: 3600
+
+# SSL/Let's Encrypt configuration
+ssl:
+  enabled: false  # Automatically set based on deployment_type
+  email: "admin@example.com"
+  staging: false  # Set to true for testing
+
+# Backup configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  s3_bucket: ""  # Optional S3 bucket for backups
+  local_path: /opt/backups
+
+# CloudWatch configuration (optional)
+cloudwatch:
+  enabled: false
+  region: us-east-1
+  log_group_prefix: "/aws/ec2/n8n"
+
+# Service ports for IP-based deployment
+service_ports:
+  n8n: 5678
+  grafana: 3000
+  prometheus: 9090
+  pgadmin: 8080
+
+# Subdomain configuration for domain-based deployment
+subdomains:
+  n8n: "n8n"
+  grafana: "grafana"
+  prometheus: "prometheus"
+  pgadmin: "pgadmin"
