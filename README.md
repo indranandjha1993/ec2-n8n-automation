@@ -239,8 +239,8 @@ pgadmin.yourdomain.com  → your-ec2-ip
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/n8n-ec2-deployment.git
-cd n8n-ec2-deployment
+git clone https://github.com/indranandjha1993/ec2-n8n-automation.git
+cd ec2-n8n-automation
 
 # 2. Make deployment script executable
 chmod +x scripts/deploy.sh
@@ -862,8 +862,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ```bash
 # Fork and clone the repository
-git clone https://github.com/your-username/n8n-ec2-deployment.git
-cd n8n-ec2-deployment
+git clone https://github.com/indranandjha1993/ec2-n8n-automation.git
+cd ec2-n8n-automation
 
 # Create a feature branch
 git checkout -b feature/your-feature-name
@@ -897,6 +897,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **⭐ If this project helped you, please give it a star! ⭐**
 
-[🐛 Report Bug](https://github.com/your-username/n8n-ec2-deployment/issues) • [✨ Request Feature](https://github.com/your-username/n8n-ec2-deployment/issues) • [💬 Discussions](https://github.com/your-username/n8n-ec2-deployment/discussions)
+[🐛 Report Bug](https://github.com/indranandjha1993/ec2-n8n-automation/issues) • [✨ Request Feature](https://github.com/indranandjha1993/ec2-n8n-automation/issues) • [💬 Discussions](https://github.com/indranandjha1993/ec2-n8n-automation/discussions)
 
 </div>

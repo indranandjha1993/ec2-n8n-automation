@@ -50,11 +50,11 @@ This project adheres to a code of conduct that we expect all contributors to fol
 ```bash
 # 1. Fork the repository on GitHub
 # 2. Clone your fork
-git clone https://github.com/YOUR_USERNAME/n8n-ec2-deployment.git
-cd n8n-ec2-deployment
+git clone https://github.com/YOUR_USERNAME/ec2-n8n-automation.git
+cd ec2-n8n-automation
 
 # 3. Add upstream remote
-git remote add upstream https://github.com/ORIGINAL_OWNER/n8n-ec2-deployment.git
+git remote add upstream https://github.com/indranandjha1993/ec2-n8n-automation.git
 
 # 4. Create a new branch for your feature
 git checkout -b feature/your-feature-name
@@ -76,7 +76,7 @@ cp inventory/group_vars/all.yml.example inventory/group_vars/all.yml
 ### Project Structure
 
 ```
-n8n-ec2-deployment/
+ec2-n8n-automation/
 ├── ansible.cfg                 # Ansible configuration
 ├── inventory/                  # Inventory and variables
 │   ├── hosts.yml              # Host definitions

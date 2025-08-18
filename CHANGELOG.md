@@ -185,6 +185,6 @@ When adding entries to this changelog:
 
 - [Keep a Changelog](https://keepachangelog.com/)
 - [Semantic Versioning](https://semver.org/)
-- [Project Repository](https://github.com/your-username/n8n-ec2-deployment)
-- [Issue Tracker](https://github.com/your-username/n8n-ec2-deployment/issues)
+- [Project Repository](https://github.com/indranandjha1993/ec2-n8n-automation)
+- [Issue Tracker](https://github.com/indranandjha1993/ec2-n8n-automation/issues)
 - [Documentation](docs/)

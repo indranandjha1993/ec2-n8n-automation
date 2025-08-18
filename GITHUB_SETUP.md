@@ -11,7 +11,7 @@
 2. **Add the remote origin**:
    ```bash
    cd /Users/indranandjha/personal/ec2-n8n-automation
-   git remote add origin https://github.com/YOUR_USERNAME/ec2-n8n-automation.git
+   git remote add origin https://github.com/indranandjha1993/ec2-n8n-automation.git
    ```
 
 3. **Push the repository**:
