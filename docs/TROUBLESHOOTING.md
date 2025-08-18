@@ -624,7 +624,7 @@ When creating an issue, include:
 For critical production issues:
 
 1. **Check the documentation**: [📚 Documentation Index](../README.md#-documentation)
-2. **Search existing issues**: [GitHub Issues](https://github.com/your-repo/issues)
+2. **Search existing issues**: [GitHub Issues](https://github.com/indranandjha1993/ec2-n8n-automation/issues)
 3. **Create a new issue**: [New Issue Template](../.github/ISSUE_TEMPLATE.md)
 
 ## Prevention

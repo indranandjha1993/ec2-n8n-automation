@@ -14,6 +14,18 @@
     },
     {
       "pattern": "^http://demo-ip"
+    },
+    {
+      "pattern": "^https://n8n\\.demo\\.com"
+    },
+    {
+      "pattern": "^https://grafana\\.demo\\.com"
+    },
+    {
+      "pattern": "^https://prometheus\\.demo\\.com"
+    },
+    {
+      "pattern": "^https://pgadmin\\.demo\\.com"
     }
   ],
   "timeout": "20s",

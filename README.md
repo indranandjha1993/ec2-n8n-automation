@@ -897,6 +897,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **⭐ If this project helped you, please give it a star! ⭐**
 
-[🐛 Report Bug](https://github.com/indranandjha1993/ec2-n8n-automation/issues) • [✨ Request Feature](https://github.com/indranandjha1993/ec2-n8n-automation/issues) • [💬 Discussions](https://github.com/indranandjha1993/ec2-n8n-automation/discussions)
+[🐛 Report Bug](https://github.com/indranandjha1993/ec2-n8n-automation/issues) • [✨ Request Feature](https://github.com/indranandjha1993/ec2-n8n-automation/issues) • [💬 Community](https://github.com/indranandjha1993/ec2-n8n-automation)
 
 </div>
