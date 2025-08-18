@@ -1,7 +1,7 @@
 ---
 name: Security Scan
 
-on:
+'on':
   push:
     branches: [main, develop]
   pull_request:
@@ -119,7 +119,7 @@ jobs:
           # Check for hardcoded passwords (excluding Ansible password generation)
           echo "Checking for hardcoded passwords..."
           HARDCODED_FOUND=false
-          
+
           # Look for password assignments but exclude legitimate Ansible patterns
           if grep -r "password.*=" roles/ playbooks/ --include="*.yml" \
              --include="*.yaml" 2>/dev/null | \
@@ -136,7 +136,7 @@ jobs:
              grep -v "password.*null" | \
              grep -v "password.*''" | \
              grep -v "#.*password" > /tmp/password_check.txt; then
-            
+
             if [ -s /tmp/password_check.txt ]; then
               echo "❌ WARNING: Potential hardcoded passwords found!"
               cat /tmp/password_check.txt
@@ -145,7 +145,7 @@ jobs:
               HARDCODED_FOUND=true
             fi
           fi
-          
+
           if [ "$HARDCODED_FOUND" = false ]; then
             echo "✅ No hardcoded passwords found"
             echo "Note: Ansible password generation functions (lookup('password')) are acceptable"

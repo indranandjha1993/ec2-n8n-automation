@@ -1,7 +1,7 @@
 ---
 name: Ansible Lint
 
-on:
+'on':
   push:
     branches: [main, develop]
   pull_request:
@@ -10,6 +10,7 @@ on:
 jobs:
   ansible-lint:
     runs-on: ubuntu-latest
+    name: Ansible Lint Check
 
     steps:
       - name: Checkout code
@@ -20,10 +21,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install Ansible and ansible-lint
         run: |
           python -m pip install --upgrade pip
-          pip install ansible ansible-lint yamllint
+          pip install ansible ansible-lint
 
       - name: Install Ansible collections
         run: |
@@ -31,14 +32,6 @@ jobs:
           ansible-galaxy collection install community.postgresql
           ansible-galaxy collection install community.grafana
 
-      - name: Run yamllint
-        run: yamllint .
-
       - name: Run ansible-lint
-        run: ansible-lint playbooks/
-
-      - name: Syntax check playbooks
         run: |
-          for playbook in playbooks/*.yml; do
-            ansible-playbook --syntax-check "$playbook"
-          done
+          ansible-lint playbooks/

@@ -1,7 +1,7 @@
 ---
 name: Documentation Check
 
-on:
+'on':
   push:
     branches: [main, develop]
   pull_request:
@@ -10,6 +10,7 @@ on:
 jobs:
   docs-check:
     runs-on: ubuntu-latest
+    name: Check Documentation
 
     steps:
       - name: Checkout code
@@ -20,16 +21,51 @@ jobs:
         with:
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
-          config-file: '.github/workflows/markdown-link-check-config.json'
+          config-file: '.github/mlc_config.json'
 
-      - name: Validate README structure
+      - name: Check documentation structure
         run: |
-          # Check if required sections exist in README
-          sections=("Overview" "Features" "Prerequisites" "Quick Start" "Configuration" "Troubleshooting")
-          for section in "${sections[@]}"; do
-            if ! grep -q "## .*$section" README.md; then
-              echo "Missing section: $section"
+          echo "Checking documentation structure..."
+          
+          # Check if required documentation files exist
+          REQUIRED_DOCS=(
+            "README.md"
+            "CHANGELOG.md"
+            "SECURITY.md"
+            "CONTRIBUTING.md"
+            "docs/ARCHITECTURE.md"
+            "docs/DEPLOYMENT_GUIDE.md"
+            "docs/CONFIGURATION.md"
+            "docs/SECURITY_GUIDELINES.md"
+            "docs/MONITORING.md"
+            "docs/BACKUP.md"
+            "docs/MAINTENANCE.md"
+            "docs/TROUBLESHOOTING.md"
+          )
+          
+          MISSING_DOCS=()
+          for doc in "${REQUIRED_DOCS[@]}"; do
+            if [ ! -f "$doc" ]; then
+              MISSING_DOCS+=("$doc")
+            fi
+          done
+          
+          if [ ${#MISSING_DOCS[@]} -gt 0 ]; then
+            echo "❌ Missing required documentation files:"
+            printf '%s\n' "${MISSING_DOCS[@]}"
+            exit 1
+          else
+            echo "✅ All required documentation files are present"
+          fi
+          
+          # Check if documentation files are not empty
+          echo "Checking documentation content..."
+          for doc in "${REQUIRED_DOCS[@]}"; do
+            if [ -f "$doc" ] && [ ! -s "$doc" ]; then
+              echo "❌ Documentation file is empty: $doc"
               exit 1
             fi
           done
-          echo "All required sections found in README.md"
+          
+          echo "✅ All documentation files have content"
+          echo "📚 Documentation structure check completed successfully!"
