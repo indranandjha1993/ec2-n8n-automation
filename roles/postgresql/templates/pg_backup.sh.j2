@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# PostgreSQL Backup Script
+set -euo pipefail
+
+BACKUP_DIR="{{ backup.local_path }}/postgresql"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+RETENTION_DAYS={{ backup.retention_days }}
+
+# Create backup directory
+mkdir -p "$BACKUP_DIR"
+
+# Create backup
+pg_dump {{ postgresql.database }} > "$BACKUP_DIR/postgresql_backup_$TIMESTAMP.sql"
+
+# Compress backup
+gzip "$BACKUP_DIR/postgresql_backup_$TIMESTAMP.sql"
+
+# Clean up old backups
+find "$BACKUP_DIR" -name "postgresql_backup_*.sql.gz" -mtime +$RETENTION_DAYS -delete
+
+echo "PostgreSQL backup completed: postgresql_backup_$TIMESTAMP.sql.gz"

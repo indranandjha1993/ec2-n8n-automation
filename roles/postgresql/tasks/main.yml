@@ -1,0 +1,75 @@
+---
+- name: Install PostgreSQL
+  apt:
+    name:
+      - postgresql-{{ postgresql.version }}
+      - postgresql-contrib-{{ postgresql.version }}
+      - postgresql-client-{{ postgresql.version }}
+    state: present
+  tags: [postgresql, database]
+
+- name: Start and enable PostgreSQL
+  systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+  tags: [postgresql, database]
+
+- name: Set PostgreSQL password for postgres user
+  postgresql_user:
+    name: postgres
+    password: "{{ db_password }}"
+    encrypted: yes
+  become_user: postgres
+  tags: [postgresql, security]
+
+- name: Create n8n database user
+  postgresql_user:
+    name: "{{ postgresql.user }}"
+    password: "{{ postgresql.password }}"
+    encrypted: yes
+    role_attr_flags: CREATEDB,NOSUPERUSER
+  become_user: postgres
+  tags: [postgresql, database]
+
+- name: Create n8n database
+  postgresql_db:
+    name: "{{ postgresql.database }}"
+    owner: "{{ postgresql.user }}"
+    encoding: UTF8
+    lc_collate: en_US.UTF-8
+    lc_ctype: en_US.UTF-8
+  become_user: postgres
+  tags: [postgresql, database]
+
+- name: Configure PostgreSQL
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/postgresql/{{ postgresql.version }}/main/{{ item }}"
+    owner: postgres
+    group: postgres
+    mode: '0644'
+    backup: yes
+  loop:
+    - postgresql.conf
+    - pg_hba.conf
+  notify: restart postgresql
+  tags: [postgresql, config]
+
+- name: Create PostgreSQL backup script
+  template:
+    src: pg_backup.sh.j2
+    dest: /usr/local/bin/pg_backup.sh
+    mode: '0755'
+  when: backup.enabled
+  tags: [postgresql, backup]
+
+- name: Set up PostgreSQL backup cron job
+  cron:
+    name: "PostgreSQL backup"
+    minute: "0"
+    hour: "1"
+    job: "/usr/local/bin/pg_backup.sh"
+    user: postgres
+  when: backup.enabled
+  tags: [postgresql, backup]
