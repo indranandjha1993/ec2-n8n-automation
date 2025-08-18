@@ -13,6 +13,7 @@ on:
 permissions:
   contents: read
   security-events: write
+  actions: read
 
 jobs:
   security-scan:
@@ -22,6 +23,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
@@ -30,6 +33,7 @@ jobs:
           scan-ref: '.'
           format: 'sarif'
           output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
@@ -37,22 +41,96 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-      - name: Check for secrets with GitLeaks
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install security scanning tools
+        run: |
+          pip install ansible-lint bandit safety
+          ansible-galaxy collection install community.general community.postgresql community.grafana
+
+      - name: Run GitLeaks secret scan
+        run: |
+          # Install GitLeaks
+          wget -q https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_8.18.4_linux_x64.tar.gz
+          tar -xzf gitleaks_8.18.4_linux_x64.tar.gz
+          chmod +x gitleaks
+          
+          # Run GitLeaks scan
+          ./gitleaks detect --source . --config .gitleaks.toml --verbose --no-git || {
+            echo "GitLeaks found potential secrets. Please review the output above."
+            exit 1
+          }
 
       - name: Ansible security scan
         run: |
-          pip install ansible-lint
-          ansible-galaxy collection install community.general community.postgresql community.grafana
+          echo "🔍 Running Ansible security checks..."
           
           # Run ansible-lint with security focus
+          echo "Running ansible-lint..."
           ansible-lint playbooks/ --profile=production
           
-          # Check for common security issues in Ansible
+          # Check for hardcoded passwords
           echo "Checking for hardcoded passwords..."
-          grep -r "password.*=" roles/ playbooks/ || echo "No hardcoded passwords found"
+          if grep -r "password.*=" roles/ playbooks/ --include="*.yml" --include="*.yaml" 2>/dev/null | grep -v "password.*{{" | grep -v "password.*\[\]" | grep -v "password.*\"\""; then
+            echo "❌ WARNING: Potential hardcoded passwords found!"
+            echo "Please use variables or Ansible Vault for sensitive data."
+            exit 1
+          else
+            echo "✅ No hardcoded passwords found"
+          fi
           
-          echo "Checking for insecure permissions..."
-          grep -r "mode.*777\|mode.*666" roles/ playbooks/ || echo "No insecure permissions found"
+          # Check for insecure permissions
+          echo "Checking for insecure file permissions..."
+          if grep -r "mode.*777\|mode.*666" roles/ playbooks/ --include="*.yml" --include="*.yaml" 2>/dev/null; then
+            echo "❌ WARNING: Insecure file permissions found!"
+            echo "Avoid using 777 or 666 permissions."
+            exit 1
+          else
+            echo "✅ No insecure permissions found"
+          fi
+          
+          # Check for potential command injection
+          echo "Checking for potential command injection..."
+          if grep -r "shell.*{{.*}}" roles/ playbooks/ --include="*.yml" --include="*.yaml" 2>/dev/null; then
+            echo "⚠️  WARNING: Potential command injection vulnerabilities found!"
+            echo "Review shell commands with variables for proper escaping"
+            echo "Consider using 'quote' filter: {{ variable | quote }}"
+          else
+            echo "✅ No obvious command injection patterns found"
+          fi
+          
+          # Check for HTTP URLs (should use HTTPS)
+          echo "Checking for insecure HTTP URLs..."
+          if grep -r "http://" roles/ playbooks/ --include="*.yml" --include="*.yaml" 2>/dev/null | grep -v "http://localhost" | grep -v "http://127.0.0.1"; then
+            echo "⚠️  WARNING: HTTP URLs found. Consider using HTTPS where possible."
+          else
+            echo "✅ No insecure HTTP URLs found"
+          fi
+          
+          echo "🎉 Ansible security scan completed!"
+
+      - name: Check for common security issues
+        run: |
+          echo "🔍 Running additional security checks..."
+          
+          # Check for TODO/FIXME comments that might indicate security issues
+          echo "Checking for security-related TODOs..."
+          if grep -r "TODO.*security\|FIXME.*security\|TODO.*password\|FIXME.*password" . --include="*.yml" --include="*.yaml" --include="*.py" --include="*.sh" 2>/dev/null; then
+            echo "⚠️  Found security-related TODOs. Please review and address them."
+          else
+            echo "✅ No security-related TODOs found"
+          fi
+          
+          # Check for debug statements that might leak information
+          echo "Checking for debug statements..."
+          if grep -r "debug.*password\|debug.*secret\|debug.*key" roles/ playbooks/ --include="*.yml" --include="*.yaml" 2>/dev/null; then
+            echo "❌ WARNING: Debug statements with sensitive data found!"
+            exit 1
+          else
+            echo "✅ No sensitive debug statements found"
+          fi
+          
+          echo "🎉 Security checks completed successfully!"
