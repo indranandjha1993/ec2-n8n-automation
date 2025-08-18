@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2025-08-18
+
+### Added
+- Comprehensive MONITORING.md documentation with Grafana and Prometheus guides
+- Detailed BACKUP.md documentation with recovery procedures and S3 integration
+- Complete MAINTENANCE.md documentation with daily, weekly, and monthly tasks
+- Troubleshooting guides for monitoring and backup components
+
+### Fixed
+- Broken GitHub discussions link in README
+- Placeholder repository URLs in troubleshooting documentation
+- Missing documentation files causing CI/CD link check failures
+- Markdown link check configuration for better coverage
+
+### Improved
+- Complete documentation coverage for all project components
+- CI/CD pipeline reliability with passing documentation checks
+- User experience with comprehensive maintenance and monitoring guides
+
 ## [1.1.1] - 2025-08-18
 
 ### Fixed
