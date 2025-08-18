@@ -1,0 +1,133 @@
+# Ansible
+*.retry
+.vault_pass
+vault_pass.txt
+host_vars/*/vault.yml
+group_vars/*/vault.yml
+
+# Sensitive configuration files
+inventory/group_vars/all.yml
+inventory/hosts.yml
+*.pem
+*.key
+*.crt
+*.p12
+
+# Logs
+*.log
+logs/
+/var/log/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Backup files
+*.bak
+*.backup
+*~
+.#*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Local development
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Test files
+test_results/
+coverage/
+.coverage
+.pytest_cache/
+
+# Documentation build
+_build/
+.doctrees/
+
+# Terraform (if used)
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# AWS
+.aws/
+aws-credentials
+
+# Local overrides
+local_settings.yml
+override.yml
+custom.yml
+
+# Runtime files
+*.pid
+*.sock
+
+# SSL certificates (except examples)
+ssl/
+certs/
+*.csr
+*.crt
+*.key
+!examples/*.crt
+!examples/*.key
+
+# Backup directories
+backups/
+*.tar.gz
+*.zip
+
+# Node modules (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
