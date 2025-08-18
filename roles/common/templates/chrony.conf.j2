@@ -1,0 +1,17 @@
+# Use public servers from the pool.ntp.org project
+pool 2.pool.ntp.org iburst
+
+# Use AWS time servers if available
+server 169.254.169.123 prefer iburst minpoll 4 maxpoll 4
+
+# Record the rate at which the system clock gains/losses time
+driftfile /var/lib/chrony/drift
+
+# Allow the system clock to be stepped in the first three updates
+makestep 1.0 3
+
+# Enable kernel synchronization of the real-time clock (RTC)
+rtcsync
+
+# Specify directory for log files
+logdir /var/log/chrony

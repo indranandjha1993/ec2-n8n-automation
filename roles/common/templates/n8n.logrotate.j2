@@ -1,0 +1,12 @@
+/var/log/n8n/*.log {
+    daily
+    missingok
+    rotate 52
+    compress
+    delaycompress
+    notifempty
+    create 644 {{ n8n.user }} {{ n8n.group }}
+    postrotate
+        systemctl reload nginx > /dev/null 2>&1 || true
+    endscript
+}

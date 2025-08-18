@@ -1,0 +1,152 @@
+---
+- name: Update system packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+    cache_valid_time: 3600
+  tags: [system, security]
+
+- name: Install essential packages
+  apt:
+    name:
+      - curl
+      - wget
+      - git
+      - unzip
+      - htop
+      - vim
+      - jq
+      - python3-pip
+      - python3-psycopg2
+      - python3-redis
+      - fail2ban
+      - ufw
+      - chrony
+      - certbot
+      - python3-certbot-nginx
+      - nginx
+      - openssl
+    state: present
+  tags: [system, packages]
+
+- name: Configure timezone
+  timezone:
+    name: "{{ n8n.timezone }}"
+  tags: [system]
+
+- name: Configure chrony for time synchronization
+  template:
+    src: chrony.conf.j2
+    dest: /etc/chrony/chrony.conf
+    backup: yes
+  notify: restart chrony
+  tags: [system, time]
+
+- name: Start and enable chrony
+  systemd:
+    name: chrony
+    state: started
+    enabled: yes
+  tags: [system, time]
+
+- name: Configure UFW firewall rules
+  ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port | default(omit) }}"
+    proto: "{{ item.proto | default('tcp') }}"
+    src: "{{ item.src | default('any') }}"
+    comment: "{{ item.comment | default(omit) }}"
+  loop:
+    - { rule: "allow", port: "{{ security.ssh_port }}", comment: "SSH access" }
+    - { rule: "allow", port: "80", comment: "HTTP" }
+    - { rule: "allow", port: "443", comment: "HTTPS" }
+    # IP-based deployment ports
+    - { rule: "allow", port: "{{ service_ports.n8n }}", comment: "n8n direct access" }
+    - { rule: "allow", port: "{{ service_ports.grafana }}", comment: "Grafana direct access" }
+    - { rule: "allow", port: "{{ service_ports.prometheus }}", comment: "Prometheus direct access" }
+    - { rule: "allow", port: "{{ service_ports.pgadmin }}", comment: "pgAdmin direct access" }
+  when: security.ufw_enabled
+  tags: [security, firewall]
+
+- name: Enable UFW
+  ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
+  when: security.ufw_enabled
+  tags: [security, firewall]
+
+- name: Configure fail2ban
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/fail2ban/{{ item }}"
+    backup: yes
+  loop:
+    - jail.local
+  notify: restart fail2ban
+  when: security.fail2ban_enabled
+  tags: [security, fail2ban]
+
+- name: Start and enable fail2ban
+  systemd:
+    name: fail2ban
+    state: started
+    enabled: yes
+  when: security.fail2ban_enabled
+  tags: [security, fail2ban]
+
+- name: Create application user
+  user:
+    name: "{{ n8n.user }}"
+    group: "{{ n8n.group }}"
+    home: "{{ n8n.home_dir }}"
+    shell: /bin/bash
+    system: yes
+    create_home: yes
+  tags: [system, users]
+
+- name: Create necessary directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0755') }}"
+  loop:
+    - { path: "{{ n8n.home_dir }}", owner: "{{ n8n.user }}", group: "{{ n8n.group }}" }
+    - { path: "{{ n8n.home_dir }}/.n8n", owner: "{{ n8n.user }}", group: "{{ n8n.group }}", mode: "0750" }
+    - { path: "{{ n8n.home_dir }}/logs", owner: "{{ n8n.user }}", group: "{{ n8n.group }}" }
+    - { path: "/var/log/n8n", owner: "{{ n8n.user }}", group: "{{ n8n.group }}" }
+    - { path: "{{ backup.local_path }}", mode: "0750" }
+    - { path: "/etc/nginx/ssl", mode: "0700" }
+  tags: [system, directories]
+
+- name: Set up log rotation for n8n
+  template:
+    src: n8n.logrotate.j2
+    dest: /etc/logrotate.d/n8n
+  tags: [system, logging]
+
+- name: Generate secure passwords if not provided
+  set_fact:
+    db_password: "{{ db_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=32')) }}"
+    redis_password: "{{ redis_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=32')) }}"
+    n8n_password: "{{ n8n_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=16')) }}"
+    grafana_password: "{{ grafana_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=16')) }}"
+    pgadmin_password: "{{ pgadmin_password | default(lookup('password', '/dev/null chars=ascii_letters,digits length=16')) }}"
+  no_log: true
+  tags: [security, passwords]
+
+- name: Display generated passwords
+  debug:
+    msg: |
+      Generated passwords (save these securely):
+      - Database password: {{ db_password }}
+      - Redis password: {{ redis_password }}
+      - n8n password: {{ n8n_password }}
+      - Grafana password: {{ grafana_password }}
+      - pgAdmin password: {{ pgadmin_password }}
+  when: 
+    - db_password is defined
+    - redis_password is defined
+  tags: [security, passwords]

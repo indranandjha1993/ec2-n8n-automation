@@ -1,0 +1,38 @@
+[DEFAULT]
+bantime = {{ security.ban_time }}
+findtime = 600
+maxretry = {{ security.max_login_attempts }}
+banaction = ufw
+ignoreip = 127.0.0.1/8 ::1 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+
+[sshd]
+enabled = true
+port = {{ security.ssh_port }}
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+bantime = 1800
+
+[nginx-http-auth]
+enabled = true
+filter = nginx-http-auth
+logpath = /var/log/nginx/error.log
+maxretry = 5
+
+[nginx-noscript]
+enabled = true
+filter = nginx-noscript
+logpath = /var/log/nginx/access.log
+maxretry = 6
+
+[nginx-badbots]
+enabled = true
+filter = nginx-badbots
+logpath = /var/log/nginx/access.log
+maxretry = 2
+
+[nginx-noproxy]
+enabled = true
+filter = nginx-noproxy
+logpath = /var/log/nginx/access.log
+maxretry = 2
