@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.6] - 2025-08-18
+
+### Fixed
+- GitHub release workflow 403 permission errors preventing release creation
+- Missing explicit permissions for contents and packages write access
+- Authentication issues with GitHub release action
+
+### Improved
+- Update softprops/action-gh-release to v2 for better compatibility
+- Add explicit token parameter for reliable authentication
+- Complete end-to-end automated release process functionality
+
+### Completed
+- Full CI/CD pipeline with working GitHub releases and distribution archives
+- Professional-grade automated testing, validation, and release management
+- Complete project ready for community use and contributions
+
 ## [1.1.5] - 2025-08-18
 
 ### Fixed
