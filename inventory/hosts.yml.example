@@ -1,0 +1,19 @@
+---
+# Example inventory file
+# Copy this to hosts.yml and customize for your deployment
+
+all:
+  children:
+    n8n_servers:
+      hosts:
+        n8n-server:
+          # For remote deployment
+          ansible_host: "your-ec2-ip-address"
+          ansible_user: "ubuntu"
+          ansible_ssh_private_key_file: "~/.ssh/your-key.pem"
+          
+          # For local deployment (uncomment below and comment above)
+          # ansible_host: "localhost"
+          # ansible_connection: "local"
+          
+          ansible_python_interpreter: /usr/bin/python3
